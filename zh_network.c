@@ -4,7 +4,7 @@
 #define ZH_NETWORK_DATA_SEND_FAIL BIT1
 
 static void s_zh_network_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status);
-static void s_zh_network_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int data_len);
+static void s_zh_network_recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int data_len);
 static void s_zh_network_processing(void *pvParameter);
 
 static EventGroupHandle_t s_zh_network_send_cb_status_event_group_handle = {0};
@@ -89,7 +89,7 @@ esp_err_t zh_network_init(zh_network_init_config_t *config)
     esp_now_init();
     esp_now_register_send_cb(s_zh_network_send_cb);
     esp_now_register_recv_cb(s_zh_network_recv_cb);
-    xTaskCreate(&s_zh_network_processing, "zh_network_processing", s_zh_network_init_config.stack_size, NULL, s_zh_network_init_config.task_priority, &s_zh_network_processing_task_handle);
+    xTaskCreatePinnedToCore(&s_zh_network_processing, "zh_network_processing", s_zh_network_init_config.stack_size, NULL, s_zh_network_init_config.task_priority, &s_zh_network_processing_task_handle, tskNO_AFFINITY);
     return ESP_OK;
 }
 
@@ -154,7 +154,7 @@ static void s_zh_network_send_cb(const uint8_t *mac_addr, esp_now_send_status_t 
     }
 }
 
-static void s_zh_network_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int data_len)
+static void s_zh_network_recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int data_len)
 {
     if (data_len == sizeof(zh_network_data_t))
     {
@@ -184,7 +184,7 @@ static void s_zh_network_recv_cb(const uint8_t *mac_addr, const uint8_t *data, i
         zh_network_queue.id = ZH_NETWORK_ON_RECV;
         recv_data = &zh_network_queue.data;
         memcpy(recv_data, data, data_len);
-        memcpy(recv_data->sender_mac, mac_addr, ESP_NOW_ETH_ALEN);
+        memcpy(recv_data->sender_mac, esp_now_info->src_addr, ESP_NOW_ETH_ALEN);
         xQueueSend(s_zh_network_queue_handle, &zh_network_queue, portMAX_DELAY);
     }
 }

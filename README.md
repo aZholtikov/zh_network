@@ -1,4 +1,4 @@
-# ESP8266 RTOS SDK component for ESP-NOW based mesh network
+# ESP32 ESP-IDF component for ESP-NOW based mesh network
 
 There are two branches - for ESP8266 family and for ESP32 family. Please use the appropriate one.
 
@@ -91,7 +91,7 @@ void app_main(void)
     zh_network_init_config_t zh_network_init_config = ZH_NETWORK_INIT_CONFIG_DEFAULT();
     zh_network_init_config.id_vector_size = 150; // Just for an example of how to change the default values.
     zh_network_init(&zh_network_init_config);
-    esp_event_handler_register(ZH_NETWORK, ESP_EVENT_ANY_ID, &zh_network_event_handler, NULL);
+    esp_event_handler_instance_register(ZH_NETWORK, ESP_EVENT_ANY_ID, &zh_network_event_handler, NULL, NULL);
     example_message_t send_message;
     for (;;)
     {
