@@ -5,7 +5,7 @@ There are two branches - for ESP8266 family and for ESP32 family. Please use the
 ## Features
 
 1. The maximum size of transmitted data is up to 218 bytes. For details see Attention.
-2. Support any data types.
+2. Support of any data types.
 3. All nodes are not visible to the network scanner.
 4. Not required a pre-pairings for data transfer.
 5. Broadcast or unicast data transmissions.
