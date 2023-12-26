@@ -46,7 +46,7 @@ In an existing project, run the following command to install the component:
 ```text
 cd ../your_project/components
 git clone http://git.zh.com.ru/alexey.zholtikov/zh_vector.git
-git clone -b esp8266 --recursive http://git.zh.com.ru/alexey.zholtikov/zh_network.git
+git clone -b esp32 --recursive http://git.zh.com.ru/alexey.zholtikov/zh_network.git
 ```
 
 In the application, add the component:
