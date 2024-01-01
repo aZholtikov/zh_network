@@ -59,7 +59,6 @@ extern "C"
     typedef struct zh_network_event_on_send_t
     {
         uint8_t mac_addr[ESP_NOW_ETH_ALEN];
-        uint32_t message_id;
         zh_network_on_send_event_type_t status;
     } __attribute__((packed)) zh_network_event_on_send_t;
 
@@ -96,10 +95,10 @@ extern "C"
      * @param[in]  data_len  Length of transmitted data.
      *
      * * @return
-     *              - ID of the sent message
-     *              - 0 if any error
+     *              - ESP_OK if sent was successful
+     *              - ESP_ERR_INVALID_SIZE if any error
      */
-    uint32_t zh_network_send(const uint8_t *target, const uint8_t *data, const uint8_t data_len);
+    esp_err_t zh_network_send(const uint8_t *target, const uint8_t *data, const uint8_t data_len);
 
 #ifdef __cplusplus
 }

@@ -45,7 +45,7 @@ In an existing project, run the following command to install the component:
 
 ```text
 cd ../your_project/components
-git clone --branch v1.1.0 http://git.zh.com.ru/alexey.zholtikov/zh_vector.git
+git clone http://git.zh.com.ru/alexey.zholtikov/zh_vector.git
 git clone -b esp32 --recursive http://git.zh.com.ru/alexey.zholtikov/zh_network.git
 ```
 
@@ -93,15 +93,15 @@ void app_main(void)
     zh_network_init(&zh_network_init_config);
     esp_event_handler_instance_register(ZH_NETWORK, ESP_EVENT_ANY_ID, &zh_network_event_handler, NULL, NULL);
     example_message_t send_message;
+    strcpy(send_message.char_value, "THIS IS A CHAR");
+    send_message.float_value = 1.234;
+    send_message.bool_value = false;
     for (;;)
     {
-        strcpy(send_message.char_value, "THIS IS A CHAR");
         send_message.int_value = esp_random();
-        send_message.float_value = 1.234;
-        send_message.bool_value = false;
         zh_network_send(NULL, (uint8_t *)&send_message, sizeof(send_message));
         vTaskDelay(5000 / portTICK_PERIOD_MS);
-        printf("Message ID %d is sent.\n", zh_network_send(target, (uint8_t *)&send_message, sizeof(send_message)));
+        zh_network_send(target, (uint8_t *)&send_message, sizeof(send_message));
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 }
@@ -124,11 +124,11 @@ void zh_network_event_handler(void *arg, esp_event_base_t event_base, int32_t ev
         zh_network_event_on_send_t *send_data = event_data;
         if (send_data->status == ZH_NETWORK_SEND_SUCCESS)
         {
-            printf("Message ID %d to MAC %02X:%02X:%02X:%02X:%02X:%02X sent success.\n", send_data->message_id, MAC2STR(send_data->mac_addr));
+            printf("Message to MAC %02X:%02X:%02X:%02X:%02X:%02X sent success.\n", MAC2STR(send_data->mac_addr));
         }
         else
         {
-            printf("Message ID %d to MAC %02X:%02X:%02X:%02X:%02X:%02X sent fail.\n", send_data->message_id, MAC2STR(send_data->mac_addr));
+            printf("Message to MAC %02X:%02X:%02X:%02X:%02X:%02X sent fail.\n", MAC2STR(send_data->mac_addr));
         }
     default:
         break;
