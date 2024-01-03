@@ -1,6 +1,6 @@
 # ESP32 ESP-IDF component for ESP-NOW based mesh network
 
-There are two branches - for ESP8266 family and for ESP32 family. Please use the appropriate one.
+There are three branches - for ESP8266 RTOS SDK (esp8266-rtos), for ESP32 ESP-IDF (esp32-idf) and for ESP32 Arduino (esp32-arduino). Please use the appropriate one.
 
 ## Features
 
@@ -19,7 +19,7 @@ There are two branches - for ESP8266 family and for ESP32 family. Please use the
 
 1. The definition of ZH_NETWORK_MAX_MESSAGE_SIZE in the zh_network.h can be changed between 1 and 218. Smaller size - higher transmission speed. All devices on the network must have the same ZH_NETWORK_MAX_MESSAGE_SIZE.
 2. For correct work at ESP-NOW + STA mode your WiFi router must be set on channel 1.
-3. The ZHNetwork library for Arduino and the zh_network component for RTOS SDK and ESP-IDF are currently incompatible. It will be fixed soon.
+3. The ZHNetwork and the zh_network are incompatible.
 
 ## Testing
 
@@ -46,7 +46,7 @@ In an existing project, run the following command to install the component:
 ```text
 cd ../your_project/components
 git clone http://git.zh.com.ru/alexey.zholtikov/zh_vector.git
-git clone -b esp32 --recursive http://git.zh.com.ru/alexey.zholtikov/zh_network.git
+git clone -b esp32-idf --recursive http://git.zh.com.ru/alexey.zholtikov/zh_network.git
 ```
 
 In the application, add the component:
