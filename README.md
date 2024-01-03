@@ -130,6 +130,7 @@ void zh_network_event_handler(void *arg, esp_event_base_t event_base, int32_t ev
         {
             printf("Message to MAC %02X:%02X:%02X:%02X:%02X:%02X sent fail.\n", MAC2STR(send_data->mac_addr));
         }
+        break;
     default:
         break;
     }
