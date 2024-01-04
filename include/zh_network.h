@@ -102,6 +102,8 @@ extern "C"
 
     /**
      * @brief      Get routing table.
+     * 
+     * @attention  Please be careful with using because changing the route vector can cause unpredictable errors.
      *
      * @return
      *              - Pointer to routing table
