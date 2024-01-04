@@ -100,6 +100,14 @@ extern "C"
      */
     esp_err_t zh_network_send(const uint8_t *target, const uint8_t *data, const uint8_t data_len);
 
+    /**
+     * @brief      Get routing table.
+     *
+     * @return
+     *              - Pointer to routing table
+     */
+    void *zh_network_get_route(void);
+
 #ifdef __cplusplus
 }
 #endif

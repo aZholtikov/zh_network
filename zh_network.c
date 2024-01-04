@@ -265,7 +265,6 @@ static void s_zh_network_processing(void *pvParameter)
                         if (memcmp(zh_network_data->original_target_mac, routing_table->original_target_mac, ESP_NOW_ETH_ALEN) == 0)
                         {
                             zh_vector_delete_item(&s_route_vector, i);
-                            break;
                         }
                     }
                     zh_network_queue.id = ZH_NETWORK_WAIT_ROUTE;
@@ -343,7 +342,6 @@ static void s_zh_network_processing(void *pvParameter)
                     if (memcmp(zh_network_data->original_target_mac, routing_table->original_target_mac, ESP_NOW_ETH_ALEN) == 0)
                     {
                         zh_vector_delete_item(&s_route_vector, i);
-                        break;
                     }
                 }
                 { // Just to avoid the compiler warning.
@@ -378,7 +376,6 @@ static void s_zh_network_processing(void *pvParameter)
                     if (memcmp(zh_network_data->original_target_mac, routing_table->original_target_mac, ESP_NOW_ETH_ALEN) == 0)
                     {
                         zh_vector_delete_item(&s_route_vector, i);
-                        break;
                     }
                 }
                 { // Just to avoid the compiler warning.
@@ -468,4 +465,9 @@ static void s_zh_network_processing(void *pvParameter)
         }
     }
     vTaskDelete(NULL);
+}
+
+void *zh_network_get_route(void)
+{
+    return &s_route_vector;
 }
