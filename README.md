@@ -1,6 +1,6 @@
 # ESP32 ESP-IDF component for ESP-NOW based mesh network
 
-There are four branches - for ESP8266 RTOS SDK (esp8266), for ESP32 ESP-IDF (esp32), for ESP32 Arduino (arduino-esp32) and for ESP8266 Arduino (arduino-esp8266). Please use the appropriate one.
+There are two branches - for ESP8266 family and for ESP32 family. Please use the appropriate one.
 
 ## Features
 
