@@ -2,14 +2,18 @@
 
 #include "string.h"
 #include "esp_err.h"
-#include "esp_mac.h"
-#include "esp_random.h"
 #include "esp_timer.h"
 #include "esp_wifi.h"
 #include "esp_now.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 #include "zh_vector.h"
+#ifdef CONFIG_IDF_TARGET_ESP8266
+#include "esp_system.h"
+#else
+#include "esp_random.h"
+#include "esp_mac.h"
+#endif
 
 #define ZH_NETWORK_MAX_MESSAGE_SIZE 218 // Maximum value of the transmitted data size (value range from 1 to 218).
 

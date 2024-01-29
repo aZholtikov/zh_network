@@ -1,6 +1,4 @@
-# ESP32 ESP-IDF component for ESP-NOW based mesh network
-
-There are two branches - for ESP8266 family and for ESP32 family. Please use the appropriate one.
+# ESP32 ESP-IDF and ESP8266 RTOS SDK component for ESP-NOW based mesh network
 
 ## Features
 
@@ -46,7 +44,7 @@ In an existing project, run the following command to install the component:
 ```text
 cd ../your_project/components
 git clone http://git.zh.com.ru/alexey.zholtikov/zh_vector.git
-git clone -b esp32 --recursive http://git.zh.com.ru/alexey.zholtikov/zh_network.git
+git clone http://git.zh.com.ru/alexey.zholtikov/zh_network.git
 ```
 
 In the application, add the component:
@@ -91,7 +89,11 @@ void app_main(void)
     zh_network_init_config_t zh_network_init_config = ZH_NETWORK_INIT_CONFIG_DEFAULT();
     zh_network_init_config.id_vector_size = 150; // Just for an example of how to change the default values.
     zh_network_init(&zh_network_init_config);
+#ifdef CONFIG_IDF_TARGET_ESP8266
+    esp_event_handler_register(ZH_NETWORK, ESP_EVENT_ANY_ID, &zh_network_event_handler, NULL);
+#else
     esp_event_handler_instance_register(ZH_NETWORK, ESP_EVENT_ANY_ID, &zh_network_event_handler, NULL, NULL);
+#endif
     example_message_t send_message;
     strcpy(send_message.char_value, "THIS IS A CHAR");
     send_message.float_value = 1.234;

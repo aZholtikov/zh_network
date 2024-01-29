@@ -4,7 +4,11 @@
 #define ZH_NETWORK_DATA_SEND_FAIL BIT1
 
 static void s_zh_network_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status);
+#ifdef CONFIG_IDF_TARGET_ESP8266
+static void s_zh_network_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int data_len);
+#else
 static void s_zh_network_recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int data_len);
+#endif
 static void s_zh_network_processing(void *pvParameter);
 
 static EventGroupHandle_t s_zh_network_send_cb_status_event_group_handle = {0};
@@ -154,7 +158,11 @@ static void IRAM_ATTR s_zh_network_send_cb(const uint8_t *mac_addr, esp_now_send
     }
 }
 
+#ifdef CONFIG_IDF_TARGET_ESP8266
+static void IRAM_ATTR s_zh_network_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int data_len)
+#else
 static void IRAM_ATTR s_zh_network_recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int data_len)
+#endif
 {
     if (data_len == sizeof(zh_network_data_t))
     {
@@ -180,7 +188,11 @@ static void IRAM_ATTR s_zh_network_recv_cb(const esp_now_recv_info_t *esp_now_in
         zh_network_queue.id = ZH_NETWORK_ON_RECV;
         recv_data = &zh_network_queue.data;
         memcpy(recv_data, data, data_len);
+#ifdef CONFIG_IDF_TARGET_ESP8266
+        memcpy(recv_data->sender_mac, mac_addr, ESP_NOW_ETH_ALEN);
+#else
         memcpy(recv_data->sender_mac, esp_now_info->src_addr, ESP_NOW_ETH_ALEN);
+#endif
         xQueueSend(s_zh_network_queue_handle, &zh_network_queue, portMAX_DELAY);
     }
 }
