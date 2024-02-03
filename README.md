@@ -1,5 +1,10 @@
 # ESP32 ESP-IDF and ESP8266 RTOS SDK component for ESP-NOW based mesh network
 
+## Tested on
+
+1. ESP8266 RTOS_SDK v3.4
+2. ESP32 ESP-IDF v5.1.0
+
 ## Features
 
 1. The maximum size of transmitted data is up to 218 bytes. For details see Attention.
