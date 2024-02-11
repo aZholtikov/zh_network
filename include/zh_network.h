@@ -79,7 +79,8 @@ extern "C"
      * @param[in]  config  Pointer to an initialized zh_network configuration structure. May point to a temporary variable.
      *
      * @return
-     *              - ESP_OK if initialization was successful
+     *              - ESP_OK if initialization was success
+     *              - ESP_ERR_INVALID_ARG if parameter error
      *              - ESP_ERR_WIFI_NOT_INIT if WiFi is not initialized by esp_wifi_init
      *              - ESP_ERR_INVALID_SIZE if the maximum value of the transmitted data size is incorrect
      */
@@ -99,8 +100,8 @@ extern "C"
      * @param[in]  data_len  Length of transmitted data.
      *
      * * @return
-     *              - ESP_OK if sent was successful
-     *              - ESP_ERR_INVALID_SIZE if any error
+     *              - ESP_OK if sent was success
+     *              - ESP_ERR_INVALID_ARG if parameter error
      */
     esp_err_t zh_network_send(const uint8_t *target, const uint8_t *data, const uint8_t data_len);
 

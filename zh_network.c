@@ -68,6 +68,10 @@ ESP_EVENT_DEFINE_BASE(ZH_NETWORK);
 
 esp_err_t zh_network_init(zh_network_init_config_t *config)
 {
+    if (config == NULL)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
     if (esp_wifi_set_channel(1, WIFI_SECOND_CHAN_NONE) == ESP_ERR_WIFI_NOT_INIT)
     {
         return ESP_ERR_WIFI_NOT_INIT;
@@ -114,7 +118,7 @@ esp_err_t zh_network_send(const uint8_t *target, const uint8_t *data, const uint
 {
     if (data_len > ZH_NETWORK_MAX_MESSAGE_SIZE || data_len == 0 || data == NULL)
     {
-        return ESP_ERR_INVALID_SIZE;
+        return ESP_ERR_INVALID_ARG;
     }
     zh_network_queue_t zh_network_queue = {0};
     zh_network_queue.id = ZH_NETWORK_ON_SEND;
