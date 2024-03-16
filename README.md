@@ -144,5 +144,6 @@ void zh_network_event_handler(void *arg, esp_event_base_t event_base, int32_t ev
     }
 }
 ```
+Thanks to [Marton Larrosa](mailto:marton@marton.com.ar) for participating in the testing.
 
 Any [feedback](mailto:github@azholtikov.ru) will be gladly accepted.
