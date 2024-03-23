@@ -101,6 +101,7 @@ extern "C"
      *
      * * @return
      *              - ESP_OK if sent was success
+     *              - ESP_FAIL if queue for send message is full
      *              - ESP_ERR_INVALID_ARG if parameter error
      */
     esp_err_t zh_network_send(const uint8_t *target, const uint8_t *data, const uint8_t data_len);

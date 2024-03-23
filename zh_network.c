@@ -116,6 +116,10 @@ void zh_network_deinit(void)
 
 esp_err_t zh_network_send(const uint8_t *target, const uint8_t *data, const uint8_t data_len)
 {
+    if (uxQueueSpacesAvailable(s_zh_network_queue_handle) < s_zh_network_init_config.queue_size / 2)
+    {
+        return ESP_FAIL;
+    }
     if (data_len > ZH_NETWORK_MAX_MESSAGE_SIZE || data_len == 0 || data == NULL)
     {
         return ESP_ERR_INVALID_ARG;
@@ -150,7 +154,7 @@ esp_err_t zh_network_send(const uint8_t *target, const uint8_t *data, const uint
     return ESP_OK;
 }
 
-static void IRAM_ATTR s_zh_network_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status)
+static void s_zh_network_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status)
 {
     if (status == ESP_NOW_SEND_SUCCESS)
     {
@@ -163,11 +167,15 @@ static void IRAM_ATTR s_zh_network_send_cb(const uint8_t *mac_addr, esp_now_send
 }
 
 #ifdef CONFIG_IDF_TARGET_ESP8266
-static void IRAM_ATTR s_zh_network_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int data_len)
+static void s_zh_network_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int data_len)
 #else
-static void IRAM_ATTR s_zh_network_recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int data_len)
+static void s_zh_network_recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int data_len)
 #endif
 {
+    if (uxQueueSpacesAvailable(s_zh_network_queue_handle) < s_zh_network_init_config.queue_size / 2)
+    {
+        return;
+    }
     if (data_len == sizeof(zh_network_data_t))
     {
         zh_network_data_t *recv_data = (zh_network_data_t *)data;
@@ -216,11 +224,6 @@ static void s_zh_network_processing(void *pvParameter)
             if (zh_network_data->message_type == ZH_NETWORK_BROADCAST || zh_network_data->message_type == ZH_NETWORK_SEARCH_REQUEST || zh_network_data->message_type == ZH_NETWORK_SEARCH_RESPONSE)
             {
                 memcpy(peer->peer_addr, &s_broadcast_mac, ESP_NOW_ETH_ALEN);
-                zh_vector_push_back(&s_id_vector, &zh_network_data->message_id);
-                if (zh_vector_get_size(&s_id_vector) > s_zh_network_init_config.id_vector_size)
-                {
-                    zh_vector_delete_item(&s_id_vector, 0);
-                }
             }
             else
             {
