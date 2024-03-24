@@ -8,6 +8,7 @@ static void s_zh_network_send_cb(const uint8_t *mac_addr, esp_now_send_status_t 
 static void s_zh_network_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int data_len);
 #else
 static void s_zh_network_recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int data_len);
+static portMUX_TYPE s_zh_network_spinlock = portMUX_INITIALIZER_UNLOCKED;
 #endif
 static void s_zh_network_processing(void *pvParameter);
 
@@ -191,11 +192,21 @@ static void s_zh_network_recv_cb(const esp_now_recv_info_t *esp_now_info, const 
                 return;
             }
         }
+#ifdef CONFIG_IDF_TARGET_ESP8266
+        taskENTER_CRITICAL();
+#else
+        taskENTER_CRITICAL(&s_zh_network_spinlock);
+#endif
         zh_vector_push_back(&s_id_vector, &recv_data->message_id);
         if (zh_vector_get_size(&s_id_vector) > s_zh_network_init_config.id_vector_size)
         {
             zh_vector_delete_item(&s_id_vector, 0);
         }
+#ifdef CONFIG_IDF_TARGET_ESP8266
+        taskEXIT_CRITICAL();
+#else
+        taskEXIT_CRITICAL(&s_zh_network_spinlock);
+#endif
         zh_network_queue_t zh_network_queue = {0};
         zh_network_queue.id = ZH_NETWORK_ON_RECV;
         recv_data = &zh_network_queue.data;
@@ -224,6 +235,21 @@ static void s_zh_network_processing(void *pvParameter)
             if (zh_network_data->message_type == ZH_NETWORK_BROADCAST || zh_network_data->message_type == ZH_NETWORK_SEARCH_REQUEST || zh_network_data->message_type == ZH_NETWORK_SEARCH_RESPONSE)
             {
                 memcpy(peer->peer_addr, &s_broadcast_mac, ESP_NOW_ETH_ALEN);
+#ifdef CONFIG_IDF_TARGET_ESP8266
+                taskENTER_CRITICAL();
+#else
+                taskENTER_CRITICAL(&s_zh_network_spinlock);
+#endif
+                zh_vector_push_back(&s_id_vector, &zh_network_data->message_id);
+                if (zh_vector_get_size(&s_id_vector) > s_zh_network_init_config.id_vector_size)
+                {
+                    zh_vector_delete_item(&s_id_vector, 0);
+                }
+#ifdef CONFIG_IDF_TARGET_ESP8266
+                taskEXIT_CRITICAL();
+#else
+                taskEXIT_CRITICAL(&s_zh_network_spinlock);
+#endif
             }
             else
             {
