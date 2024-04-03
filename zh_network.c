@@ -20,7 +20,7 @@ static zh_vector_t s_id_vector = {0};
 static zh_vector_t s_route_vector = {0};
 static zh_vector_t s_response_vector = {0};
 static uint8_t s_self_mac[ESP_NOW_ETH_ALEN] = {0};
-static uint8_t s_broadcast_mac[ESP_NOW_ETH_ALEN] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+static const uint8_t s_broadcast_mac[ESP_NOW_ETH_ALEN] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 typedef enum zh_network_message_type_t
 {
@@ -92,9 +92,9 @@ esp_err_t zh_network_init(zh_network_init_config_t *config)
     s_zh_network_init_config = *config;
     s_zh_network_send_cb_status_event_group_handle = xEventGroupCreate();
     s_zh_network_queue_handle = xQueueCreate(s_zh_network_init_config.queue_size, sizeof(zh_network_queue_t));
-    zh_vector_init(&s_id_vector, sizeof(uint32_t));
-    zh_vector_init(&s_route_vector, sizeof(zh_network_routing_table_t));
-    zh_vector_init(&s_response_vector, sizeof(uint32_t));
+    zh_vector_init(&s_id_vector, sizeof(uint32_t), false);
+    zh_vector_init(&s_route_vector, sizeof(zh_network_routing_table_t), false);
+    zh_vector_init(&s_response_vector, sizeof(uint32_t), false);
     esp_now_init();
     esp_now_register_send_cb(s_zh_network_send_cb);
     esp_now_register_recv_cb(s_zh_network_recv_cb);
