@@ -129,7 +129,7 @@ esp_err_t zh_network_send(const uint8_t *target, const uint8_t *data, const uint
     zh_network_queue.id = ZH_NETWORK_ON_SEND;
     zh_network_data_t *send_data = &zh_network_queue.data;
     send_data->network_id = s_zh_network_init_config.network_id;
-    send_data->message_id = abs(esp_random()); // I don't know why, but esp_random() sometimes produces negative values.
+    send_data->message_id = esp_random();
     memcpy(send_data->original_sender_mac, &s_self_mac, ESP_NOW_ETH_ALEN);
     if (target == NULL)
     {
@@ -273,7 +273,7 @@ static void s_zh_network_processing(void *pvParameter)
                     memcpy(zh_network_data->original_sender_mac, &s_self_mac, ESP_NOW_ETH_ALEN);
                     zh_network_data->data_len = 0;
                     memset(zh_network_data->data, 0, ZH_NETWORK_MAX_MESSAGE_SIZE);
-                    zh_network_data->message_id = abs(esp_random()); // I don't know why, but esp_random() sometimes produces negative values.
+                    zh_network_data->message_id = esp_random();
                     xQueueSend(s_zh_network_queue_handle, &zh_network_queue, portMAX_DELAY);
                     goto ZH_NETWORK_ON_SEND_EXIT;
                 }
@@ -320,7 +320,7 @@ static void s_zh_network_processing(void *pvParameter)
                     memcpy(zh_network_data->original_sender_mac, &s_self_mac, ESP_NOW_ETH_ALEN);
                     zh_network_data->data_len = 0;
                     memset(zh_network_data->data, 0, ZH_NETWORK_MAX_MESSAGE_SIZE);
-                    zh_network_data->message_id = abs(esp_random()); // I don't know why, but esp_random() sometimes produces negative values.
+                    zh_network_data->message_id = esp_random();
                     xQueueSend(s_zh_network_queue_handle, &zh_network_queue, portMAX_DELAY);
                 }
             }
@@ -360,7 +360,7 @@ static void s_zh_network_processing(void *pvParameter)
                     zh_network_data->data_len = 0;
                     memset(zh_network_data->data, 0, ZH_NETWORK_MAX_MESSAGE_SIZE);
                     zh_network_data->confirm_id = zh_network_data->message_id;
-                    zh_network_data->message_id = abs(esp_random()); // I don't know why, but esp_random() sometimes produces negative values.
+                    zh_network_data->message_id = esp_random();
                     xQueueSend(s_zh_network_queue_handle, &zh_network_queue, portMAX_DELAY);
                     break;
                 }
@@ -407,7 +407,7 @@ static void s_zh_network_processing(void *pvParameter)
                     memcpy(zh_network_data->original_sender_mac, &s_self_mac, ESP_NOW_ETH_ALEN);
                     zh_network_data->data_len = 0;
                     memset(zh_network_data->data, 0, ZH_NETWORK_MAX_MESSAGE_SIZE);
-                    zh_network_data->message_id = abs(esp_random()); // I don't know why, but esp_random() sometimes produces negative values.
+                    zh_network_data->message_id = esp_random();
                     xQueueSend(s_zh_network_queue_handle, &zh_network_queue, portMAX_DELAY);
                     break;
                 }
