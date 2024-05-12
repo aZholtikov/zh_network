@@ -31,6 +31,11 @@
 3. Move transmitter as far away from receiver as possible until receiver is able to receive data (shield module if necessary).
 4. Turn on the 2nd receiver and place it between the 1st receiver and transmitter (preferably in the middle). The 1st receiver will resume data reception (with relaying through the 2nd receiver). P.S. You can use a transmitter instead of the 2nd receiver - makes no difference.
 
+## Arduino library
+
+1. For using zh_network component on Arduino download and copy (with extract) zh_network.zip file to your folder for Arduilo librarys. See README.md in this folder for using example.
+2. Please pay attention - library tested on VSCode + PlatformIO. Not on Arduino IDE.
+
 ## Dependencies
 
 1. [zh_vector](http://git.zh.com.ru/alexey.zholtikov/zh_vector.git)
