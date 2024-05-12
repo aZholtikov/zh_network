@@ -33,7 +33,7 @@
 
 ## Arduino library
 
-1. For using zh_network component on Arduino download and copy (with extract) zh_network.zip file to your folder for Arduilo librarys. See README.md in this folder for using example.
+1. For using zh_network component on Arduino download and copy (with extract) zh_network.zip file to your folder for Arduino libraries. See README.md in this folder for using example.
 2. Please pay attention - library tested on VSCode + PlatformIO. Not on Arduino IDE.
 
 ## Dependencies
