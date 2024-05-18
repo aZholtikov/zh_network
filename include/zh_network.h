@@ -153,6 +153,7 @@ extern "C"
      *
      * @return
      *              - ESP_OK if deinitialization was success
+     *              - ESP_FAIL if ESP-NOW is not initialized
      */
     esp_err_t zh_network_deinit(void);
 
