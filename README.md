@@ -38,7 +38,7 @@
 
 ## Dependencies
 
-1. [zh_vector](http://git.zh.com.ru/alexey.zholtikov/zh_vector.git)
+1. [zh_vector](https://github.com/aZholtikov/zh_vector.git)
 
 ## [Function description](http://zh-network.zh.com.ru)
 
@@ -48,8 +48,8 @@ In an existing project, run the following command to install the component:
 
 ```text
 cd ../your_project/components
-git clone http://git.zh.com.ru/alexey.zholtikov/zh_vector.git
-git clone http://git.zh.com.ru/alexey.zholtikov/zh_network.git
+git clone https://github.com/aZholtikov/zh_vector.git
+git clone https://github.com/aZholtikov/zh_network.git
 ```
 
 In the application, add the component:
