@@ -6,28 +6,15 @@
 
 #pragma once
 
-#include "string.h"
-#include "esp_err.h"
-#include "esp_timer.h"
 #include "esp_wifi.h"
-#include "esp_now.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/event_groups.h"
-#include "esp_log.h"
-#include "esp_heap_caps.h"
-#include "zh_vector.h"
-#ifdef CONFIG_IDF_TARGET_ESP8266
-#include "esp_system.h"
-#else
-#include "esp_random.h"
-#include "esp_mac.h"
-#endif
 
 /**
  * @brief Unique identifier of ESP-NOW interface events base. Used when registering the event handler.
  *
  */
+#ifndef ESP_EVENT_BASE
 #define ESP_EVENT_BASE ZH_NETWORK
+#endif
 
 /**
  * @brief Maximum value of the transmitted data size.
@@ -37,7 +24,9 @@
  * @attention All devices on the network must have the same ZH_NETWORK_MAX_MESSAGE_SIZE.
  *
  */
+#ifndef ZH_NETWORK_MAX_MESSAGE_SIZE
 #define ZH_NETWORK_MAX_MESSAGE_SIZE 218
+#endif
 
 /**
  * @brief Default values for zh_network_init_config_t structure for initial initialization of ESP-NOW interface.

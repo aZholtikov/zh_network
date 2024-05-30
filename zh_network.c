@@ -4,6 +4,21 @@
  */
 
 #include "zh_network.h"
+#include "string.h"
+#include "esp_err.h"
+#include "esp_timer.h"
+#include "esp_now.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/event_groups.h"
+#include "esp_log.h"
+#include "esp_heap_caps.h"
+#include "zh_vector.h"
+#ifdef CONFIG_IDF_TARGET_ESP8266
+#include "esp_system.h"
+#else
+#include "esp_random.h"
+#include "esp_mac.h"
+#endif
 
 /// \cond
 #define DATA_SEND_SUCCESS BIT0
@@ -12,7 +27,7 @@
 /// \endcond
 
 static void _send_cb(const uint8_t *mac_addr, esp_now_send_status_t status);
-#ifdef CONFIG_IDF_TARGET_ESP8266
+#if defined(CONFIG_IDF_TARGET_ESP8266) || ESP_IDF_VERSION_MAJOR == 4
 static void _recv_cb(const uint8_t *mac_addr, const uint8_t *data, int data_len);
 #else
 static void _recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int data_len);
@@ -228,13 +243,13 @@ static void _send_cb(const uint8_t *mac_addr, esp_now_send_status_t status)
     }
 }
 
-#ifdef CONFIG_IDF_TARGET_ESP8266
+#if defined(CONFIG_IDF_TARGET_ESP8266) || ESP_IDF_VERSION_MAJOR == 4
 static void _recv_cb(const uint8_t *mac_addr, const uint8_t *data, int data_len)
 #else
 static void _recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int data_len)
 #endif
 {
-#ifdef CONFIG_IDF_TARGET_ESP8266
+#if defined(CONFIG_IDF_TARGET_ESP8266) || ESP_IDF_VERSION_MAJOR == 4
     ESP_LOGI(TAG, "Adding incoming ESP-NOW data from MAC %02X:%02X:%02X:%02X:%02X:%02X to queue begin.", MAC2STR(mac_addr));
 #else
     ESP_LOGI(TAG, "Adding incoming ESP-NOW data from MAC %02X:%02X:%02X:%02X:%02X:%02X to queue begin.", MAC2STR(esp_now_info->src_addr));
@@ -274,12 +289,12 @@ static void _recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_t *dat
         queue.id = ON_RECV;
         recv_data = &queue.data;
         memcpy(recv_data, data, data_len);
-#ifdef CONFIG_IDF_TARGET_ESP8266
+#if defined(CONFIG_IDF_TARGET_ESP8266) || ESP_IDF_VERSION_MAJOR == 4
         memcpy(recv_data->sender_mac, mac_addr, 6);
 #else
         memcpy(recv_data->sender_mac, esp_now_info->src_addr, 6);
 #endif
-#ifdef CONFIG_IDF_TARGET_ESP8266
+#if defined(CONFIG_IDF_TARGET_ESP8266) || ESP_IDF_VERSION_MAJOR == 4
         ESP_LOGI(TAG, "Adding incoming ESP-NOW data from MAC %02X:%02X:%02X:%02X:%02X:%02X to queue success.", MAC2STR(mac_addr));
 #else
         ESP_LOGI(TAG, "Adding incoming ESP-NOW data from MAC %02X:%02X:%02X:%02X:%02X:%02X to queue success.", MAC2STR(esp_now_info->src_addr));
