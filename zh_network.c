@@ -226,7 +226,7 @@ esp_err_t zh_network_send(const uint8_t *target, const uint8_t *data, const uint
     }
     if (xQueueSend(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
     {
-        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
     }
     return ESP_OK;
 }
@@ -301,7 +301,7 @@ static void _recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_t *dat
 #endif
         if (xQueueSendToFront(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
         {
-            ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+            ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
         }
     }
     else
@@ -375,7 +375,7 @@ static void _processing(void *pvParameter)
                     queue.time = esp_timer_get_time() / 1000;
                     if (xQueueSend(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                     {
-                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                     }
                     ESP_LOGI(TAG, "System message for routing request from MAC %02X:%02X:%02X:%02X:%02X:%02X to MAC %02X:%02X:%02X:%02X:%02X:%02X added to queue.", MAC2STR(queue.data.original_sender_mac), MAC2STR(queue.data.original_target_mac));
                     queue.id = TO_SEND;
@@ -387,7 +387,7 @@ static void _processing(void *pvParameter)
                     ESP_LOGI(TAG, "Outgoing ESP-NOW data from MAC %02X:%02X:%02X:%02X:%02X:%02X to MAC %02X:%02X:%02X:%02X:%02X:%02X processed success.", MAC2STR(queue.data.original_sender_mac), MAC2STR(queue.data.original_target_mac));
                     if (xQueueSendToFront(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                     {
-                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                     }
                     heap_caps_free(peer);
                     break;
@@ -411,7 +411,7 @@ static void _processing(void *pvParameter)
             memcpy(on_send->mac_addr, data->original_target_mac, 6);
             if (esp_now_send((uint8_t *)peer->peer_addr, (uint8_t *)data, sizeof(data_t)) != ESP_OK)
             {
-                ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                 heap_caps_free(peer);
                 heap_caps_free(on_send);
                 break;
@@ -426,9 +426,10 @@ static void _processing(void *pvParameter)
                         ESP_LOGI(TAG, "Broadcast message from MAC %02X:%02X:%02X:%02X:%02X:%02X to MAC %02X:%02X:%02X:%02X:%02X:%02X sent success.", MAC2STR(queue.data.original_sender_mac), MAC2STR(queue.data.original_target_mac));
                         on_send->status = ZH_NETWORK_SEND_SUCCESS;
                         ESP_LOGI(TAG, "Outgoing ESP-NOW data from MAC %02X:%02X:%02X:%02X:%02X:%02X to MAC %02X:%02X:%02X:%02X:%02X:%02X processed success.", MAC2STR(queue.data.original_sender_mac), MAC2STR(queue.data.original_target_mac));
-                        if (esp_event_post(ZH_NETWORK, ZH_NETWORK_ON_SEND_EVENT, on_send, sizeof(zh_network_event_on_send_t), portTICK_PERIOD_MS) != ESP_OK)
+                        esp_err_t errcode = esp_event_post(ZH_NETWORK, ZH_NETWORK_ON_SEND_EVENT, on_send, sizeof(zh_network_event_on_send_t), portTICK_PERIOD_MS);
+                        if (errcode != ESP_OK)
                         {
-                            ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                            ESP_LOGE(TAG, "ESP-NOW message processing task internal error : errcode %d at line %d", errcode, __LINE__);
                         }
                     }
                     if (data->message_type == SEARCH_REQUEST)
@@ -455,7 +456,7 @@ static void _processing(void *pvParameter)
                         queue.time = esp_timer_get_time() / 1000;
                         if (xQueueSend(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                         {
-                            ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                            ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                         }
                     }
                 }
@@ -513,7 +514,7 @@ static void _processing(void *pvParameter)
                     queue.time = esp_timer_get_time() / 1000;
                     if (xQueueSend(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                     {
-                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                     }
                     ESP_LOGI(TAG, "System message for routing request to MAC %02X:%02X:%02X:%02X:%02X:%02X added to queue.", MAC2STR(queue.data.original_target_mac));
                     queue.id = TO_SEND;
@@ -525,7 +526,7 @@ static void _processing(void *pvParameter)
                     ESP_LOGI(TAG, "Outgoing ESP-NOW data from MAC %02X:%02X:%02X:%02X:%02X:%02X to MAC %02X:%02X:%02X:%02X:%02X:%02X processed success.", MAC2STR(queue.data.original_sender_mac), MAC2STR(queue.data.original_target_mac));
                     if (xQueueSendToFront(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                     {
-                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                     }
                 }
             }
@@ -542,7 +543,7 @@ static void _processing(void *pvParameter)
                 zh_network_event_on_recv_t *on_recv = heap_caps_malloc(sizeof(zh_network_event_on_recv_t), MALLOC_CAP_8BIT);
                 if (on_recv == NULL)
                 {
-                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                     heap_caps_free(on_recv);
                     break;
                 }
@@ -552,7 +553,7 @@ static void _processing(void *pvParameter)
                 on_recv->data = heap_caps_malloc(data->data_len, MALLOC_CAP_8BIT);
                 if (on_recv->data == NULL)
                 {
-                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                     heap_caps_free(on_recv);
                     heap_caps_free(on_recv->data);
                     break;
@@ -563,13 +564,13 @@ static void _processing(void *pvParameter)
                 ESP_LOGI(TAG, "Incoming ESP-NOW data from MAC %02X:%02X:%02X:%02X:%02X:%02X to MAC %02X:%02X:%02X:%02X:%02X:%02X processed success.", MAC2STR(queue.data.original_sender_mac), MAC2STR(queue.data.original_target_mac));
                 if (esp_event_post(ZH_NETWORK, ZH_NETWORK_ON_RECV_EVENT, on_recv, sizeof(zh_network_event_on_recv_t) + on_recv->data_len + sizeof(on_recv->data_len), portTICK_PERIOD_MS) != ESP_OK)
                 {
-                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                 }
                 heap_caps_free(on_recv);
                 queue.id = TO_SEND;
                 if (xQueueSend(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                 {
-                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                 }
                 break;
             case UNICAST:;
@@ -579,7 +580,7 @@ static void _processing(void *pvParameter)
                     zh_network_event_on_recv_t *on_recv = heap_caps_malloc(sizeof(zh_network_event_on_recv_t), MALLOC_CAP_8BIT);
                     if (on_recv == NULL)
                     {
-                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                         heap_caps_free(on_recv);
                         break;
                     }
@@ -589,7 +590,7 @@ static void _processing(void *pvParameter)
                     on_recv->data = heap_caps_malloc(data->data_len, MALLOC_CAP_8BIT);
                     if (on_recv->data == NULL)
                     {
-                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                         heap_caps_free(on_recv);
                         heap_caps_free(on_recv->data);
                         break;
@@ -599,7 +600,7 @@ static void _processing(void *pvParameter)
                     ESP_LOGI(TAG, "Incoming ESP-NOW data from MAC %02X:%02X:%02X:%02X:%02X:%02X to MAC %02X:%02X:%02X:%02X:%02X:%02X processed success.", MAC2STR(queue.data.original_sender_mac), MAC2STR(queue.data.original_target_mac));
                     if (esp_event_post(ZH_NETWORK, ZH_NETWORK_ON_RECV_EVENT, on_recv, sizeof(zh_network_event_on_recv_t) + on_recv->data_len + sizeof(on_recv->data_len), portTICK_PERIOD_MS) != ESP_OK)
                     {
-                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                     }
                     heap_caps_free(on_recv);
                     queue.id = TO_SEND;
@@ -612,7 +613,7 @@ static void _processing(void *pvParameter)
                     data->message_id = abs(esp_random()); // It is not clear why esp_random() sometimes gives negative values.
                     if (xQueueSendToFront(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                     {
-                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                     }
                     break;
                 }
@@ -621,7 +622,7 @@ static void _processing(void *pvParameter)
                 queue.id = TO_SEND;
                 if (xQueueSendToFront(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                 {
-                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                 }
                 break;
             case DELIVERY_CONFIRM:;
@@ -641,7 +642,7 @@ static void _processing(void *pvParameter)
                 queue.id = TO_SEND;
                 if (xQueueSendToFront(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                 {
-                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                 }
                 break;
             case SEARCH_REQUEST:;
@@ -677,7 +678,7 @@ static void _processing(void *pvParameter)
                     ESP_LOGI(TAG, "Incoming ESP-NOW data from MAC %02X:%02X:%02X:%02X:%02X:%02X to MAC %02X:%02X:%02X:%02X:%02X:%02X processed success.", MAC2STR(queue.data.original_sender_mac), MAC2STR(queue.data.original_target_mac));
                     if (xQueueSendToFront(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                     {
-                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                     }
                     break;
                 }
@@ -686,7 +687,7 @@ static void _processing(void *pvParameter)
                 queue.id = TO_SEND;
                 if (xQueueSendToFront(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                 {
-                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                 }
                 break;
             case SEARCH_RESPONSE:;
@@ -716,7 +717,7 @@ static void _processing(void *pvParameter)
                     queue.id = TO_SEND;
                     if (xQueueSendToFront(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                     {
-                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                     }
                     break;
                 }
@@ -736,7 +737,7 @@ static void _processing(void *pvParameter)
                     zh_network_event_on_send_t *on_send = heap_caps_malloc(sizeof(zh_network_event_on_send_t), MALLOC_CAP_8BIT);
                     if (on_send == NULL)
                     {
-                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                         heap_caps_free(on_send);
                         break;
                     }
@@ -747,7 +748,7 @@ static void _processing(void *pvParameter)
                     ESP_LOGI(TAG, "Unicast message from MAC %02X:%02X:%02X:%02X:%02X:%02X to MAC %02X:%02X:%02X:%02X:%02X:%02X removed from confirmation message waiting list.", MAC2STR(queue.data.original_sender_mac), MAC2STR(queue.data.original_target_mac));
                     if (esp_event_post(ZH_NETWORK, ZH_NETWORK_ON_SEND_EVENT, on_send, sizeof(zh_network_event_on_send_t), portTICK_PERIOD_MS) != ESP_OK)
                     {
-                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                     }
                     heap_caps_free(on_send);
                     flag = true;
@@ -764,7 +765,7 @@ static void _processing(void *pvParameter)
                         zh_network_event_on_send_t *on_send = heap_caps_malloc(sizeof(zh_network_event_on_send_t), MALLOC_CAP_8BIT);
                         if (on_send == NULL)
                         {
-                            ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                            ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                             heap_caps_free(on_send);
                             break;
                         }
@@ -775,7 +776,7 @@ static void _processing(void *pvParameter)
                         ESP_LOGI(TAG, "Unicast message from MAC %02X:%02X:%02X:%02X:%02X:%02X to MAC %02X:%02X:%02X:%02X:%02X:%02X removed from confirmation message waiting list.", MAC2STR(queue.data.original_sender_mac), MAC2STR(queue.data.original_target_mac));
                         if (esp_event_post(ZH_NETWORK, ZH_NETWORK_ON_SEND_EVENT, on_send, sizeof(zh_network_event_on_send_t), portTICK_PERIOD_MS) != ESP_OK)
                         {
-                            ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                            ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                         }
                         heap_caps_free(on_send);
                     }
@@ -783,7 +784,7 @@ static void _processing(void *pvParameter)
                 }
                 if (xQueueSend(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                 {
-                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                 }
             }
             break;
@@ -805,7 +806,7 @@ static void _processing(void *pvParameter)
                     queue.id = TO_SEND;
                     if (xQueueSend(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                     {
-                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                        ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                     }
                     flag = true;
                     break;
@@ -821,7 +822,7 @@ static void _processing(void *pvParameter)
                         zh_network_event_on_send_t *on_send = heap_caps_malloc(sizeof(zh_network_event_on_send_t), MALLOC_CAP_8BIT);
                         if (on_send == NULL)
                         {
-                            ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                            ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                             heap_caps_free(on_send);
                             break;
                         }
@@ -832,7 +833,7 @@ static void _processing(void *pvParameter)
                         ESP_LOGI(TAG, "Unicast message from MAC %02X:%02X:%02X:%02X:%02X:%02X to MAC %02X:%02X:%02X:%02X:%02X:%02X removed from routing waiting list.", MAC2STR(queue.data.original_sender_mac), MAC2STR(queue.data.original_target_mac));
                         if (esp_event_post(ZH_NETWORK, ZH_NETWORK_ON_SEND_EVENT, on_send, sizeof(zh_network_event_on_send_t), portTICK_PERIOD_MS) != ESP_OK)
                         {
-                            ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                            ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                         }
                         heap_caps_free(on_send);
                     }
@@ -851,7 +852,7 @@ static void _processing(void *pvParameter)
                 }
                 if (xQueueSend(_queue_handle, &queue, portTICK_PERIOD_MS) != pdTRUE)
                 {
-                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error.");
+                    ESP_LOGE(TAG, "ESP-NOW message processing task internal error : at line %d", __LINE__);
                 }
             }
             break;
