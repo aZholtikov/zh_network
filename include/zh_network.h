@@ -51,7 +51,9 @@
         .max_waiting_time = 1000,        \
         .id_vector_size = 100,           \
         .route_vector_size = 100,        \
-        .wifi_interface = WIFI_IF_STA    \
+        .wifi_interface = WIFI_IF_STA,   \
+        .wifi_channel = 1,               \
+        .attempts = 3                    \
     }
 
 #ifdef __cplusplus
@@ -76,6 +78,8 @@ extern "C"
         uint16_t id_vector_size;         ///< Maximum size of unique ID of received messages. @note If the size is exceeded, the first value will be deleted. Minimum recommended value: number of planned nodes in the network + 10%.
         uint16_t route_vector_size;      ///< The maximum size of the routing table. @note If the size is exceeded, the first route will be deleted. Minimum recommended value: number of planned nodes in the network + 10%.
         wifi_interface_t wifi_interface; ///< WiFi interface (STA or AP) used for ESP-NOW operation. @note The MAC address of the device depends on the selected WiFi interface.
+        uint8_t wifi_channel;            ///< Wi-Fi channel uses to send/receive ESPNOW data. @note Values from 1 to 14.
+        uint8_t attempts;                ///< Maximum number of attempts to send a message. @note It is not recommended to set a value greater than 5.
     } zh_network_init_config_t;
 
     /// \cond
@@ -140,7 +144,7 @@ extern "C"
      *              - ESP_ERR_WIFI_NOT_INIT if WiFi is not initialized
      *              - ESP_FAIL if any internal error
      */
-    esp_err_t zh_network_init(zh_network_init_config_t *config);
+    esp_err_t zh_network_init(const zh_network_init_config_t *config);
 
     /**
      * @brief Deinitialize ESP-NOW interface.
@@ -164,7 +168,7 @@ extern "C"
      *              - ESP_OK if sent was success
      *              - ESP_ERR_INVALID_ARG if parameter error
      *              - ESP_ERR_INVALID_STATE if queue for outgoing data is almost full
-     *              - ESP_FAIL if ESP-NOW is not initialized
+     *              - ESP_FAIL if ESP-NOW is not initialized or any internal error
      */
     esp_err_t zh_network_send(const uint8_t *target, const uint8_t *data, const uint8_t data_len);
 

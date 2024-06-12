@@ -21,8 +21,9 @@
 ## Attention
 
 1. The definition of ZH_NETWORK_MAX_MESSAGE_SIZE in the zh_network.h can be changed between 1 and 218. Smaller size - higher transmission speed. All devices on the network must have the same ZH_NETWORK_MAX_MESSAGE_SIZE.
-2. For correct work at ESP-NOW + STA mode your WiFi router must be set on channel 1.
-3. The ZHNetwork and the zh_network are incompatible.
+2. For correct operation in ESP-NOW + STA mode, your WiFi router must be set to the same channel as ESP-NOW.
+3. All devices on the network must have the same WiFi channel.
+4. The ZHNetwork and the zh_network are incompatible.
 
 ## Testing
 
