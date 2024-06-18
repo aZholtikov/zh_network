@@ -30,7 +30,7 @@
         .route_vector_size = 100,        \
         .wifi_interface = WIFI_IF_STA,   \
         .wifi_channel = 1,               \
-        .attempts = 3
+        .attempts = 3                    \
     }
 
 #ifdef __cplusplus
