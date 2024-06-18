@@ -1,9 +1,3 @@
-/**
- * @file
- * Header file for the zh_network component.
- *
- */
-
 #pragma once
 
 #include "string.h"
@@ -23,25 +17,8 @@
 #include "esp_mac.h"
 #endif
 
-/**
- * @brief Unique identifier of ESP-NOW interface events base. Used when registering the event handler.
- *
- */
-#define ESP_EVENT_BASE ZH_NETWORK
+#define ZH_NETWORK_MAX_MESSAGE_SIZE 218 // Maximum value of the transmitted data size. @attention All devices on the network must have the same ZH_NETWORK_MAX_MESSAGE_SIZE.
 
-/**
- * @brief Maximum value of the transmitted data size.
- *
- * @note Value range from 1 to 218. Smaller size - higher transmission speed.
- *
- * @attention All devices on the network must have the same ZH_NETWORK_MAX_MESSAGE_SIZE.
- */
-#define ZH_NETWORK_MAX_MESSAGE_SIZE 218
-
-/**
- * @brief Default values for zh_network_init_config_t structure for initial initialization of ESP-NOW interface.
- *
- */
 #define ZH_NETWORK_INIT_CONFIG_DEFAULT() \
     {                                    \
         .network_id = 0xFAFBFCFD,        \
@@ -53,7 +30,7 @@
         .route_vector_size = 100,        \
         .wifi_interface = WIFI_IF_STA,   \
         .wifi_channel = 1,               \
-        .attempts = 3                    \
+        .attempts = 3
     }
 
 #ifdef __cplusplus
@@ -61,72 +38,45 @@ extern "C"
 {
 #endif
 
-    /**
-     * @brief Structure for initial initialization of ESP-NOW interface.
-     *
-     * @note Before initialize ESP-NOW interface recommend initialize zh_network_init_config_t structure with default values.
-     *
-     * @code zh_network_init_config_t config = ZH_NETWORK_INIT_CONFIG_DEFAULT() @endcode
-     */
-    typedef struct
+    typedef struct // Structure for initial initialization of ESP-NOW interface.
     {
-        uint32_t network_id;             ///< A unique ID for the mesh network. @attention The ID must be the same for all nodes in the network.
-        uint8_t task_priority;           ///< Task priority for the ESP-NOW messages processing. @note It is not recommended to set a value less than 4.
-        uint16_t stack_size;             ///< Stack size for task for the ESP-NOW messages processing. @note The minimum size is 3072 bytes.
-        uint8_t queue_size;              ///< Queue size for task for the ESP-NOW messages processing. @note The size depends on the number of messages to be processed. It is not recommended to set the value less than 32.
-        uint16_t max_waiting_time;       ///< Maximum time to wait a response message from target node (in milliseconds). @note If a response message from the target node is not received within this time, the status of the sent message will be "sent fail".
-        uint16_t id_vector_size;         ///< Maximum size of unique ID of received messages. @note If the size is exceeded, the first value will be deleted. Minimum recommended value: number of planned nodes in the network + 10%.
-        uint16_t route_vector_size;      ///< The maximum size of the routing table. @note If the size is exceeded, the first route will be deleted. Minimum recommended value: number of planned nodes in the network + 10%.
-        wifi_interface_t wifi_interface; ///< WiFi interface (STA or AP) used for ESP-NOW operation. @note The MAC address of the device depends on the selected WiFi interface.
-        uint8_t wifi_channel;            ///< Wi-Fi channel uses to send/receive ESPNOW data. @note Values from 1 to 14.
-        uint8_t attempts;                ///< Maximum number of attempts to send a message. @note It is not recommended to set a value greater than 5.
+        uint32_t network_id;             // A unique ID for the mesh network. @attention The ID must be the same for all nodes in the network.
+        uint8_t task_priority;           // Task priority for the ESP-NOW messages processing. @note It is not recommended to set a value less than 4.
+        uint16_t stack_size;             // Stack size for task for the ESP-NOW messages processing. @note The minimum size is 3072 bytes.
+        uint8_t queue_size;              // Queue size for task for the ESP-NOW messages processing. @note The size depends on the number of messages to be processed. It is not recommended to set the value less than 32.
+        uint16_t max_waiting_time;       // Maximum time to wait a response message from target node (in milliseconds). @note If a response message from the target node is not received within this time, the status of the sent message will be "sent fail".
+        uint16_t id_vector_size;         // Maximum size of unique ID of received messages. @note If the size is exceeded, the first value will be deleted. Minimum recommended value: number of planned nodes in the network + 10%.
+        uint16_t route_vector_size;      // The maximum size of the routing table. @note If the size is exceeded, the first route will be deleted. Minimum recommended value: number of planned nodes in the network + 10%.
+        wifi_interface_t wifi_interface; // WiFi interface (STA or AP) used for ESP-NOW operation. @note The MAC address of the device depends on the selected WiFi interface.
+        uint8_t wifi_channel;            // Wi-Fi channel uses to send/receive ESPNOW data. @note Values from 1 to 14.
+        uint8_t attempts;                // Maximum number of attempts to send a message. @note It is not recommended to set a value greater than 5.
     } zh_network_init_config_t;
 
-    /// \cond
-    ESP_EVENT_DECLARE_BASE(ESP_EVENT_BASE);
-    /// \endcond
+    ESP_EVENT_DECLARE_BASE(ZH_NETWORK);
 
-    /**
-     * @brief Enumeration of possible ESP-NOW events.
-     *
-     */
-    typedef enum
+    typedef enum // Enumeration of possible ESP-NOW events.
     {
-        ZH_NETWORK_ON_RECV_EVENT, ///< The event when the ESP-NOW message was received.
-        ZH_NETWORK_ON_SEND_EVENT  ///< The event when the ESP-NOW message was sent.
+        ZH_NETWORK_ON_RECV_EVENT, // The event when the ESP-NOW message was received.
+        ZH_NETWORK_ON_SEND_EVENT  // The event when the ESP-NOW message was sent.
     } zh_network_event_type_t;
 
-    /**
-     * @brief Enumeration of possible status of sent ESP-NOW message.
-     *
-     */
-    typedef enum
+    typedef enum // Enumeration of possible status of sent ESP-NOW message.
     {
-        ZH_NETWORK_SEND_SUCCESS, ///< If ESP-NOW message was sent success.
-        ZH_NETWORK_SEND_FAIL     ///< If ESP-NOW message was sent fail.
+        ZH_NETWORK_SEND_SUCCESS, // If ESP-NOW message was sent success.
+        ZH_NETWORK_SEND_FAIL     // If ESP-NOW message was sent fail.
     } zh_network_on_send_event_type_t;
 
-    /**
-     * @brief Structure for sending data to the event handler when an ESP-NOW message was sent.
-     *
-     * @note Should be used with ZH_NETWORK event base and ZH_NETWORK_ON_SEND_EVENT event.
-     */
-    typedef struct
+    typedef struct // Structure for sending data to the event handler when an ESP-NOW message was sent. @note Should be used with ZH_NETWORK event base and ZH_NETWORK_ON_SEND_EVENT event.
     {
-        uint8_t mac_addr[6];                    ///< MAC address of the device to which the ESP-NOW message was sent. @note
-        zh_network_on_send_event_type_t status; ///< Status of sent ESP-NOW message. @note
+        uint8_t mac_addr[6];                    // MAC address of the device to which the ESP-NOW message was sent.
+        zh_network_on_send_event_type_t status; // Status of sent ESP-NOW message.
     } zh_network_event_on_send_t;
 
-    /**
-     * @brief Structure for sending data to the event handler when an ESP-NOW message was received.
-     *
-     * @note Should be used with ZH_NETWORK event base and ZH_NETWORK_ON_RECV_EVENT event.
-     */
-    typedef struct
+    typedef struct // Structure for sending data to the event handler when an ESP-NOW message was received. @note Should be used with ZH_NETWORK event base and ZH_NETWORK_ON_RECV_EVENT event.
     {
-        uint8_t mac_addr[6]; ///< MAC address of the sender ESP-NOW message. @note
-        uint8_t *data;       ///< Pointer to the data of the received ESP-NOW message. @note
-        uint8_t data_len;    ///< Size of the received ESP-NOW message. @note
+        uint8_t mac_addr[6]; // MAC address of the sender ESP-NOW message.
+        uint8_t *data;       // Pointer to the data of the received ESP-NOW message.
+        uint8_t data_len;    // Size of the received ESP-NOW message.
     } zh_network_event_on_recv_t;
 
     /**

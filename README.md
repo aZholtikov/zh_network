@@ -41,8 +41,6 @@
 
 1. [zh_vector](https://github.com/aZholtikov/zh_vector.git)
 
-## [Function description](http://zh-network.zh.com.ru)
-
 ## Using
 
 In an existing project, run the following command to install the component:
@@ -127,7 +125,7 @@ void zh_network_event_handler(void *arg, esp_event_base_t event_base, int32_t ev
         printf("Int %d\n", recv_message->int_value);
         printf("Float %f\n", recv_message->float_value);
         printf("Bool %d\n", recv_message->bool_value);
-        free(recv_data->data); // Do not delete to avoid memory leaks!
+        heap_caps_free(recv_data->data); // Do not delete to avoid memory leaks!
         break;
     case ZH_NETWORK_ON_SEND_EVENT:;
         zh_network_event_on_send_t *send_data = event_data;
