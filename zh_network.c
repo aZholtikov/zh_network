@@ -111,6 +111,14 @@ esp_err_t zh_network_init(const zh_network_init_config_t *config)
     }
     _event_group_handle = xEventGroupCreate();
     _queue_handle = xQueueCreate(_init_config.queue_size, sizeof(_queue_t));
+    if (_event_group_handle == NULL)
+    {
+        return ESP_ERR_NO_MEM;
+    }
+    if (_queue_handle == NULL)
+    {
+        return ESP_ERR_NO_MEM;
+    }
     zh_vector_init(&_id_vector, sizeof(uint32_t), false);
     zh_vector_init(&_route_vector, sizeof(_routing_table_t), false);
     zh_vector_init(&_response_vector, sizeof(uint32_t), false);
