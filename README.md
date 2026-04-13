@@ -3,7 +3,7 @@
 ## Tested on
 
 1. ESP8266 RTOS_SDK v3.4
-2. ESP32 ESP-IDF v5.2
+2. ESP32 ESP-IDF v5.5
 
 ## Features
 
