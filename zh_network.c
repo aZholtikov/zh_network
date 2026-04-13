@@ -4,7 +4,7 @@
 #define DATA_SEND_FAIL BIT1
 #define MAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5]
 
-static void _send_cb(const uint8_t *mac_addr, esp_now_send_status_t status);
+static void _send_cb(const esp_now_send_info_t *tx_info, esp_now_send_status_t status);
 #if defined CONFIG_IDF_TARGET_ESP8266 || ESP_IDF_VERSION_MAJOR == 4
 static void _recv_cb(const uint8_t *mac_addr, const uint8_t *data, int data_len);
 #else
@@ -218,7 +218,7 @@ esp_err_t zh_network_send(const uint8_t *target, const uint8_t *data, const uint
     return ESP_OK;
 }
 
-static void _send_cb(const uint8_t *mac_addr, esp_now_send_status_t status)
+static void _send_cb(const esp_now_send_info_t *tx_info, esp_now_send_status_t status)
 {
     if (status == ESP_NOW_SEND_SUCCESS)
     {
