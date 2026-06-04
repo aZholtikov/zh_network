@@ -249,7 +249,7 @@ static void _recv_cb(const esp_now_recv_info_t *esp_now_info, const uint8_t *dat
 #else
     ESP_LOGI(TAG, "Adding incoming ESP-NOW data from MAC %02X:%02X:%02X:%02X:%02X:%02X to queue begin.", MAC2STR(esp_now_info->src_addr));
 #endif
-    if (uxQueueSpacesAvailable(_queue_handle) < (_init_config.queue_size - 2))
+    if (uxQueueSpacesAvailable(_queue_handle) < (_init_config.queue_size / 2))
     {
         ESP_LOGW(TAG, "Adding incoming ESP-NOW data to queue fail. Queue is almost full.");
         return;
